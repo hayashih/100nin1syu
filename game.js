@@ -97,7 +97,7 @@ var Game = function()
     this.utaList = {};
     this.fudaList = {};
     this.participants = {};
-    this.results = {};
+    this.results = [];
     this.state = true;
 }
 
@@ -119,7 +119,7 @@ Game.prototype= {
         this.data = this.data.slice(0,dataNumber);
         
         // 札に表示する値をcontentとして持つ
-        // TODO 修正すること
+        // できれば汎用的にしたい
         for(var i=0, l = this.data.length; i<l; i++)
         {
             this.data[i].content = this.data[i].uta_shimo;
@@ -137,6 +137,8 @@ Game.prototype= {
         this.fudaList = new FudaList(loadData.fudaList.list);
         this.state = loadData.state;
         this.participants = loadData.participants;
+        // データ形式移行のための対策
+        if( !loadData.results || !loadData.results.length ){ loadData.results = []; }
         this.results = loadData.results;
     },
 
@@ -178,9 +180,7 @@ Game.prototype= {
         
         this.fudaList.setFudaColorDefault();
         
-        this.results[fuda.number] = userId;
-        //console.log(this.results)
-        //console.log(fuda.number + " " + userId);
+        this.results[this.results.length] = {"number":fuda.number, "userId":userId};
 
         this.utaList.deleteFirstUta();
         
@@ -197,5 +197,4 @@ Game.prototype= {
     },
 
 }
-
 

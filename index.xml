@@ -27,6 +27,12 @@
     div#utaArea{
         height:30px
     }
+    div#result{
+        display:none
+    }
+    a#showResultLink, a#hideResultLink{
+        display:none
+    }
     img
     {
         width:20px;
@@ -39,6 +45,12 @@
   </div>
   <table id="battlefield"></table>
   <span id="member"></span>
+  <span>
+    <a id="showResultLink">結果表示</a>
+    <a id="hideResultLink">結果を隠す</a>
+  </span>
+  <div id="resultDiv">
+  </div>
   <script>
 
     var count = 0;
@@ -46,7 +58,7 @@
     var game = null;
     var curUta = null;
 
-    var dataNumber = 20; // ゲームで使う枚数
+    var dataNumber = 20; // The number of sheets of card used in game
 
     var utaReading = false;
 
@@ -59,27 +71,24 @@
     var member = document.getElementById('member');
     var setting = document.getElementById('setting');
 
-    // 参加者情報が更新されたときの処理
+    var resultDiv = document.getElementById('resultDiv');
+    var showResultLink = document.getElementById('showResultLink');
+    var hideResultLink = document.getElementById('hideResultLink');
+
     function participantUpdated()
     {
-        var participants = wave.getParticipants(); // 参加者の配列を取得
+        var participants = wave.getParticipants(); 
                         
         for (var i = 0, l = participants.length; i < l; i++) {
             var id = participants[i].getId();
-            // アイコンを更新、新しい参加者のアイコンは新たに生成する
             var icon = icons[id] || document.createElement('IMG');
             icon.src = participants[i].getThumbnailUrl();
-            //icon.setAttribute('alt',id); // TODO: altを設定するつもりが上手く行かず
-            // icons オブジェクトに登録
             icons[id] = icon;
         }
     }
 
-    //Stateが更新されたときの処理
     function stateUpdated()
     {
-        setting.innerHTML = "";
-
         if( isDebug ){
             reset();
         }
@@ -90,30 +99,25 @@
         {
             updateGame(state);
             
-            // フダがまだ描画されていない場合
+            // display card not yet.
             if( battlefield.innerHTML == "" )
             {
                 displayFuda();
+                setting.innerHTML = "";
+                hideResult();
             }
 
         }else{
-
-            // TODO 新規ゲーム作成が2回よばれてしまう。なぜ？
-            // 新規ゲーム
             setNewGame(state);
-            
             return;
         }
         
-        // フダの表示更新
         refrashDisplay();
 
-        // 参加メンバー別フダ取得枚数
         showMemberPoint();
 
         if( game.state ){
 
-            // 現在の歌データ取得
             var uta = game.getCurrentUta();
             if( curUta == null ||
                 curUta.number != uta.number )
@@ -123,9 +127,9 @@
             }
 
             // 歌表示がまだはじまってない場合、歌を読みこみし直す
+            // When the waka display doesn't start, it tries to waka the song. 
             if( !utaReading )
             {
-                utaArea.focus(); // TODO:フォーカスが移らない
                 readUta();
                 utaReading = true;
             }
@@ -183,7 +187,7 @@
         setting.appendChild(btn);
     }
 
-    // メンバー別フダ取り枚数
+    // Acquisition number of each members
     function showMemberPoint()
     {
         member.innerHTML = "";
@@ -193,25 +197,55 @@
         }
     }
     
-    // 結果表示
-    function showResult()
+    // hide result area
+    function hideResult()
     {
-    
-        //console.log(JSON.stringify(game));
-        var resultStr = "";
-        var count = 0;
-        for( var result in game.results)
-        {
-            count++;
-            resultStr += count + "枚目.";
-            resultStr += '<img src="' + icons[game.results[result]].src + '" />';
-            resultStr += game.getUta(result).uta_kami + " " + game.getUta(result).uta_shimo + "<br />";
+        //console.log("hideResult");
 
-        }
-        member.innerHTML += "<br /><br />結果<br />" + resultStr; 
+        resultDiv.style.display = 'none';
+        resultDiv.innerHTML = "";
+        showResultLink.style.display = 'none';
+        hideResultLink.style.display = 'none';
     }
 
-    // 歌を読み込む
+    // show result area
+    function showResult()
+    {
+        //console.log("showResult");
+
+        // for old data. game.result was object in old data 
+        if( !game.results || !game.results.length ){ return; }
+
+        showResultLink.onclick = function()
+        {
+            resultDiv.style.display = "block";
+            hideResultLink.style.display = "inline";
+            showResultLink.style.display = "none";
+            gadgets.window.adjustHeight();
+        };
+
+        hideResultLink.onclick = function()
+        {
+            resultDiv.style.display = "none";
+            showResultLink.style.display = "inline";
+            hideResultLink.style.display = "none";
+            gadgets.window.adjustHeight();
+        };
+        
+        var resultStr = "";
+        for(var i=0; i < game.results.length; i++)
+        {
+            var result = game.results[i];
+            resultStr += (i+1) + "枚目.";
+            resultStr += '<img src="' + icons[result.userId].src + '" />';
+            resultStr += game.getUta(result.number).uta_kami + " " + game.getUta(result.number).uta_shimo + "<br />";
+
+        }
+        resultDiv.innerHTML = resultStr;
+        showResultLink.style.display = "inline";
+        hideResultLink.style.display = "none";
+    }
+
     function readUta()
     {
         if( timer ){ clearInterval(timer) };
@@ -221,13 +255,12 @@
         timer = setInterval("writeChar()",1000);
     }
 
-    // 表示をリフレッシュ
     function refrashDisplay()
     {
         var isFade = false;
 
         var tdlist = document.getElementsByTagName("td");
-        // ループ２重
+        // caution! nested loop!
         for(var i=0; i < tdlist.length; i++)
         {
              var td = tdlist[i];
@@ -235,7 +268,7 @@
              {
                  if( parseInt(td.id) == parseInt(game.fudaList.list[j].number) )
                  {
-                     // 背景のフェードアウト処理
+                     // fadeout background
                     if( !isFade && 
                         td.style.visibility != game.fudaList.list[j].visibility)
                     {
@@ -251,7 +284,7 @@
         }
     }
 
-    // 新規データ設定
+    // setting new game
     function setNewGame(state)
     {
         
@@ -273,7 +306,6 @@
             if( regNum.test(fnTbx.value)){
                 number = parseInt(fnTbx.value);
             }
-            //console.log(number);
             
             game = new Game();
             game.init(list_100nin1syu, number);
@@ -283,13 +315,13 @@
         
         setting.innerHTML = "枚数を決めてください。<br />"
         setting.appendChild(tbx);
-        tbx.value = String(dataNumber); // デフォルト値設定
+        tbx.value = String(dataNumber); 
         setting.appendChild(btn);
 
         gadgets.window.adjustHeight();
     }
 
-    // ゲームデータ読み込み
+    // load current game data
     function updateGame(state)
     {
         if( !wave )
@@ -299,6 +331,12 @@
         var gameData = JSON.parse(state.get("game"));
         game = new Game();
         game.load(gameData);
+
+        // game objectの形式移行のための対策
+        if( !game.results || !game.results.length )
+        {
+            game.results = [];
+        }
 
     }
 
@@ -319,11 +357,11 @@
             box.id = String(box_id);
 
             var content = game.fudaList.list[i].content;
-            // 空白削除
+            // delete space
             content = content.replace(' ','');
 
-            // 札に歌を書き込み
-            // 行を分ける
+            // write poem to card
+            // split poem line
             for(var j=0, mc = 5; j < 3; j++){
                 var gyo = document.createElement("div");
                 gyo.setAttribute("class", "gyo");
@@ -362,7 +400,7 @@
         }
     }
 
-    // 歌を一文字づつ表示
+    // display waka. characters, one each to display.
     function writeChar()
     {
         var uta = curUta.uta_kami + " "  + curUta.uta_shimo;
@@ -370,10 +408,8 @@
         {
             utaArea.innerHTML += uta[count];
             // 決まり字判定
-            //console.log("きまり字:" + curUta.kimariji + " count:" + count)
             if( curUta.kimariji && (parseInt(curUta.kimariji) == count+1) )
             {
-                //console.log("決まり字になった")
                 utaArea.innerHTML = '<span style="color:red">' + utaArea.innerHTML + '</span>';
             }
         }
@@ -395,8 +431,6 @@
          var newBgColor = "#" + str + 'FF' + str;
          battlefield.style.background = "#" + str + 'FF' + str;
 
-         //console.log("battlefield bgcolor:" + newBgColor); 
-
          if( battlefield.style.background != "#FFFFFF" )
          {
             setTimeout("fadeBackground()",1);
@@ -404,10 +438,9 @@
 
      }
 
-    // 10進数を16進数2桁に変換する関数
+    // Converting the number of two-digit decimal number to hexadecimal
     function cov16(i){
         var sin='0123456789ABCDEF';
-        //console.log(i + " " + sin.charAt(Math.floor(i/16))+sin.charAt(i%16));
         if(i>=255) return 'FF';
         if(i<=0) return '00';
         return sin.charAt(Math.floor(i/16))+sin.charAt(i%16);
