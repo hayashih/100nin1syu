@@ -1,0 +1,10 @@
+<extension
+    name="100nin1shu"
+    thumbnailUrl="http://github.com/hayashih/100nin1syu/raw/master/icon.png"
+    description="Japanese card game of '100 wapa poem'.">
+  <author name="hayashih"/>
+  <menuHook location="toolbar" text="Insert a new 100nin1shu wave."
+    iconUrl="http://github.com/hayashih/100nin1syu/raw/master/icon.png">
+        <insertGadget url="http://github.com/hayashih/100nin1syu/raw/master/index.xml"/> 
+ </menuHook>
+</extension>

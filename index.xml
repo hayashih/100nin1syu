@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Module>
-<ModulePrefs title="100nin1syu"
+<ModulePrefs title="100nin1shu"
             description="Gadget of 100 waka poem"
             author="Hiromi Hayashi">
   <Require feature="wave"/>
@@ -8,9 +8,9 @@
   </ModulePrefs>
   <Content type="html">
   <![CDATA[
-  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1syu/json2.js"></script>
-  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1syu/100nin1syu_json.js"></script>
-  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1syu/game.js"></script>
+  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1shu/json2.js"></script>
+  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1shu/100nin1shu_json.js"></script>
+  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1shu/game.js"></script>
   <script type="text/javascript" src="http://wave-api.appspot.com/public/wave.js">
   </script>
   <style>
@@ -179,7 +179,7 @@
 
             game = null;
             game = new Game();
-            game.init(list_100nin1syu, 10);
+            game.init(list_100nin1shu, 10);
             
             updateWaveState();
         };
@@ -308,7 +308,7 @@
             }
             
             game = new Game();
-            game.init(list_100nin1syu, number);
+            game.init(list_100nin1shu, number);
             
             updateWaveState();
         };
