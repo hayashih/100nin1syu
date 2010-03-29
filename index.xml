@@ -8,9 +8,9 @@
   </ModulePrefs>
   <Content type="html">
   <![CDATA[
-  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1shu/json2.js"></script>
-  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1shu/100nin1shu_json.js"></script>
-  <script type="text/javascript" src="http://www.hayashih.dev-asp.net/Wave/100nin1shu/game.js"></script>
+  <script type="text/javascript" src="http://github.com/hayashih/100nin1syu/raw/master/json2.js"></script>
+  <script type="text/javascript" src="http://github.com/hayashih/100nin1syu/raw/master/100nin1shu_json.js"></script>
+  <script type="text/javascript" src="http://github.com/hayashih/100nin1syu/raw/master/game.js"></script>
   <script type="text/javascript" src="http://wave-api.appspot.com/public/wave.js">
   </script>
   <style>
